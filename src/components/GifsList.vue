@@ -27,7 +27,7 @@
       v-if="loading"
     ></v-progress-circular>
 
-    <div class="intersection-block" v-intersect="onIntersect" v-if="loadMore"></div>
+    <div class="intersection-block" ref="intersectionBlock" v-intersect="onIntersect" v-if="loadMore && intersectionBlockVisible"></div>
   </div>
 </template>
 
@@ -42,9 +42,10 @@
         gifs: [],
         currentPage: 0,
         totalItems: null,
-        itemsPerPage: 20,
+        itemsPerPage: 10,
         loading: true,
-        showPlaceholder: false
+        showPlaceholder: false,
+        intersectionBlockVisible: true
       }
     },
     props: {
@@ -58,7 +59,7 @@
         this.showPlaceholder = false;
         this.currentPage = 0;
         this.gifs = [];
-      }
+      },
     },
     computed: {
       pageOffset() {
@@ -66,7 +67,7 @@
       },
       loadMore() {
         return !this.showPlaceholder && ((this.pageOffset < this.totalItems) || !this.totalItems)
-      }
+      },
     },
     methods: {
       async getGifs() {
@@ -89,6 +90,7 @@
         }
 
         this.loading = false;
+        this.intersectionBlockVisible = true;
         
       },
       async getPlaceholderGif() {
@@ -101,6 +103,7 @@
       onIntersect(entries, observer, isIntersecting) {
         if (isIntersecting && this.loadMore) {
           this.loading = true;
+          this.intersectionBlockVisible = false;
           this.getGifs();
           this.currentPage += 1;
         }
